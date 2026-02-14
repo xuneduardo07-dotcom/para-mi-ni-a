@@ -1,0 +1,225 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Para mi niña hermosa</title>
+    <style>
+        :root {
+            --rosa-fondo: #ffeef2;
+            --rosa-sobre: #ff8fa3;
+            --rosa-oscuro: #ff4d6d;
+            --texto: #5c2d3a;
+        }
+
+        body {
+            margin: 0; padding: 0;
+            background-color: var(--rosa-fondo);
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            display: flex; flex-direction: column;
+            align-items: center; min-height: 100vh;
+            overflow: hidden; padding: 20px;
+            justify-content: center;
+        }
+
+        /* --- CUADRO PEQUEÑO ABAJO A LA DERECHA --- */
+        .seccion-amo {
+            background: white;
+            width: 160px; /* Tamaño más compacto */
+            padding: 12px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(255, 77, 109, 0.2);
+            position: fixed;
+            bottom: 20px; /* Posicionado abajo */
+            right: 20px;  /* Posicionado a la derecha */
+            cursor: pointer;
+            transition: transform 0.2s;
+            z-index: 20;
+        }
+        
+        .seccion-amo:active { transform: scale(0.95); }
+        .titulo-amo { color: var(--rosa-oscuro); font-weight: bold; font-size: 13px; margin-bottom: 5px; }
+        #texto-amo { color: var(--texto); font-size: 13px; min-height: 20px; font-weight: 500; }
+
+        /* Corazón decorativo a la izquierda */
+        #heart-icon {
+            font-size: 60px;
+            position: fixed;
+            top: 20px;
+            left: 30px;
+            z-index: 20;
+            user-select: none;
+        }
+
+        /* Sobre centrado */
+        .envelope-wrapper { 
+            position: relative; 
+            cursor: pointer; 
+            transform: translateY(20px); 
+            z-index: 10;
+        }
+
+        .envelope {
+            position: relative; width: 280px; height: 180px;
+            background: var(--rosa-sobre); border-radius: 0 0 10px 10px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            transition: all 0.5s ease;
+        }
+
+        .envelope::before {
+            content: ""; position: absolute; top: -110px; left: 0;
+            border-left: 140px solid transparent; border-right: 140px solid transparent;
+            border-bottom: 110px solid var(--rosa-sobre);
+            transition: transform 0.6s ease; transform-origin: bottom; z-index: 4;
+        }
+
+        .envelope.open::before { transform: rotateX(180deg); z-index: 0; }
+
+        .letter {
+            position: absolute; bottom: 10px; left: 50%;
+            transform: translateX(-50%); width: 90%; height: 80%;
+            background: white; padding: 25px; box-sizing: border-box;
+            transition: all 0.8s ease; z-index: 2; border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .envelope.open .letter {
+            bottom: 40px; height: 420px; width: 310px;
+            box-shadow: 0 0 25px rgba(0,0,0,0.15); overflow-y: auto;
+        }
+
+        .letter-text {
+            font-size: 14px; color: var(--texto); line-height: 1.6;
+            text-align: left; white-space: pre-line;
+        }
+
+        .floating-bg {
+            position: absolute;
+            pointer-events: none;
+            color: var(--rosa-oscuro);
+            font-weight: bold;
+            opacity: 0.5;
+            z-index: 1;
+            animation: floatUp 5s linear forwards;
+        }
+
+        @keyframes floatUp {
+            0% { transform: translateY(110vh) scale(0.8); opacity: 0; }
+            20% { opacity: 0.5; }
+            80% { opacity: 0.5; }
+            100% { transform: translateY(-10vh) scale(1.2); opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="seccion-amo" id="btn-amo">
+        <div class="titulo-amo">✨ Amo de ti... ✨</div>
+        <div id="texto-amo">Haz clic aquí</div>
+    </div>
+
+    <div id="heart-icon">❤️</div>
+
+    <div class="envelope-wrapper" id="envelope-wrapper">
+        <div class="envelope" id="envelope">
+            <div class="letter">
+                <div class="letter-text" id="typewriter"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const cosasAmo = ["Tu sonrisa", "tus ojitos", "tu pelo", "tu risa", "tus manos", "tus labios", "tu forma de querer", "tu sentido del humor", "tu corazón", "Tu carácter", "tu inteligencia", "La manera en la que piensas", "tus pestañas", "tu honestidad", "tu lealtad", "tu voz", "lo sensible que eres", "tu niña interior", "tus regaños", "tus celos", "tu alegría", "tu seguridad", "tu perspectiva de todo", "tu apoyo", "tu cariño inmenso", "tu carisma", "La calma que me transmites", "La forma en que me aconsejas", "La manera en que me guías", "tu manera de hablar", "tu manera de escuchar", "tu energía", "la forma única que eres", "como me haces reír", "como me haces amarte", "tu amor", "como me entiendes", "tus locuras", "tus defectos", "tus cualidades", "tus valores", "Tus burlas", "tu paz", "Lo mucho que te esfuerzas", "el como te hago enojar", "tus dones", "tu ternura", "tus manitas", "tu brillo", "tus Te amo", "tus buenos días", "tus abrazos", "tu dedicación a lo que te gusta", "El como me escuchas", "tus llamadas", "tus gustos", "tu estilo 🥥☀️🍃", "tus besitos", "la forma que expresa tus sentimientos", "¡TODO DE TI LO AMO! 💘"];
+
+        let indiceAmo = 0;
+        const btnAmo = document.getElementById('btn-amo');
+        const displayAmo = document.getElementById('texto-amo');
+
+        btnAmo.addEventListener('click', () => {
+            if (indiceAmo < cosasAmo.length) {
+                displayAmo.innerText = cosasAmo[indiceAmo];
+                indiceAmo++;
+            } else {
+                indiceAmo = 0;
+                displayAmo.innerText = " PICALE AQUIIIII JSKJSKJS";
+            }
+        });
+
+        function crearTextoFondo() {
+            const textos = ["Te amo", "💘", "💗", "te quiero muchisimo ❤️","Te amo mi vida", " me encantas corazon 💘", "muaaaack 💗", "❤️"];
+            const el = document.createElement('div');
+            el.className = 'floating-bg';
+            el.innerText = textos[Math.floor(Math.random() * textos.length)];
+            el.style.left = Math.random() * 90 + "vw";
+            el.style.fontSize = (Math.random() * 15 + 12) + "px";
+            el.style.animationDuration = (Math.random() * 3 + 4) + "s";
+            document.body.appendChild(el);
+            setTimeout(() => { el.remove(); }, 7000);
+        }
+        setInterval(crearTextoFondo, 600);
+
+        const textoCarta = `Te amo muchísimo mi princesita ❤️
+
+sé que ahora estamos muy jóvenes para andar prometiendo un "para siempre" y que seguramente nos falte mucho camino por recorrer, pero la verdad es que quiero que seas tú quien me acompañe en cada paso, quiero siempre estar a tu lado, quiero siempre tomarte de la mano, no me interesa recibir mensajes de nadie más, ni buscar otros abrazos o besos, porque nadie me hace sentir esa felicidad que me das tú cuando estamos juntos, y si sé que te lo he dicho y que me siento seguro de que no pasara, pero es que en serio me da tanto miedo que algún día te aburras o quieras alejarte, porque para mí eres la persona correcta y me encantaría compartir esta vida, y si hay otra después, que también sea contigo 💘
+
+Te amo, te amo con toda mi alma y mi ser mi niña hermosa❤️, sé que a veces hay problemitas y eso, pero eso no cambia que mi amor por ti sea inmenso💗
+
+si supieras lo que siento cuando me abrazas, cuando me das besas, esa sensación maravillosa e increíble de verte a los ojos y sentir todos los sentimientos lindo que existen, esa sensación que me provocas o simplemente cuando me dices que me amas, entenderías lo mucho que te amo 💗, en verdad te agradezco por llegar a mi vida y darle ese brillo especial a mis dias, me das razones para estar feliz y para querer salir adelante siempre, desde que estamos juntos todo cambió, tengo más ganas de todo, de comer, de jugar y de disfrutar cada detalle
+
+Me encanta la conexión que tenemos y cómo logras que mis días sean mucho más alegres y coloridos 😽💗
+
+No tienes idea de cuánto te admiro 🫶🏽
+
+Me encantaría que pudieras verte a través de mis ojos para que notaras lo increíble que eres, esa nobleza que tienes, lo trabajadora, empática e inteligente que eres, me llena de orgullo todo lo que has logrado y quiero estar ahí para apoyarte en cada meta que te propongas, jamás me aburriría de ti, eres mi lugar seguro, mi refugio y el pensamiento más bonito que llena mi mente apenas me despierto 💘
+
+Gracias por hacerme el hombre más feliz del mundo, contigo me siento seguro, tranquilo y puedo ser yo mismo y si alguna vez tienes un mal día o sientes que el mundo se te viene encima, recuerda que yo siempre voy a estar para ti, si me necesitas un millón de veces, un millón de veces estaré ahí, dispuesto a darlo todo por verte bien, eres mi prioridad número uno y nada en este universo es más valioso para mí que tu amor.
+
+Hay un texto, de un escritor, que me encanta, y siento que va muy bien con lo que te digo JDKSJS dice Amm: 
+
+"Mira, vamos a plantearlo de esta manera, para mí, tu eres la número uno, y ni siquiera hay número dos."
+
+Jdks 💗 lo escribió charles bukowski JDKSJKSJSKJS y cada escrito, cada palabra de amor que él ha echo, tienen sentido gracias a ti, gracias por hacerme sentir amado 💘
+
+Tenerte a ti es tenerlo todo, te elegiría hoy y te elegiría en mil vidas más, en cualquier universo o tiempo, sin importar la distancia o condiciónes, voy a amarte hasta que no queden estrellas en el cielo y si me toca irme antes, te prometo que te esperaré en la eternidad para que terminemos el camino juntos, agarrados de la mano, eres mi niña, mi mundo y mi todo, gracias por elegirme y también por dejarme demostrarte el amor que te tengo 
+
+Te amo mi niña 🤍
+Te amo muchísimo 💗
+
+Diría Don Mario Benedetti:
+"Cómo no amarte si en tus ojos se encuentra la esencia de todo lo bello que Dios hizo en este mundo, y me regalas a diario la dicha de poder reflejarme en tu mirada"
+
+Te quiero como para escuchar tu risa toda la noche y que duermas en mi pecho, sin sombras ni fantasmas, te quiero como para no soltarte jamás 💘
+Te quiero así como eres, con todo lo bueno que no ves, con todo lo malo que dices tener 
+
+Te amo, te amo demasiado mi vida ❤️`;
+
+        let j = 0;
+        let timerEscritura;
+
+        function escribirCarta() {
+            if (j < textoCarta.length) {
+                document.getElementById("typewriter").innerHTML += textoCarta.charAt(j);
+                j++;
+                timerEscritura = setTimeout(escribirCarta, 25);
+                const letterDiv = document.querySelector('.letter');
+                letterDiv.scrollTop = letterDiv.scrollHeight;
+            }
+        }
+
+        const envelope = document.getElementById('envelope');
+        envelope.addEventListener('click', () => {
+            if(!envelope.classList.contains('open')) {
+                envelope.classList.add('open');
+                j = 0;
+                document.getElementById("typewriter").innerHTML = "";
+                setTimeout(escribirCarta, 1000);
+            } else {
+                envelope.classList.remove('open');
+                clearTimeout(timerEscritura);
+                setTimeout(() => { document.getElementById("typewriter").innerHTML = ""; }, 800);
+            }
+        });
+    </script>
+</body>
+</html>
